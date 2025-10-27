@@ -91,7 +91,7 @@ st.markdown("""
 # ----------------------------
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1K0KxYzI7td53UmLu_5ZeK9_FDk1UoD0h0IpUYTg1mmY/edit?usp=sharing"
 GOOGLE_DRIVE_FOLDER_ID = "1SO-p_yU7ARjEsMIcEqu7m2T8Dh2Bt4BJ"
-BASELINE_PATH = "baseline_static_data.XLSX"
+BASELINE_PATH = "/baseline_static_data.XLSX"
 
 # ----------------------------
 # LOAD CREDENTIALS
