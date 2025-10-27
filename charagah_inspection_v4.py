@@ -110,7 +110,6 @@ except Exception:
 # 🌿 GREEN THEME UI (Cyber Dashboard Style)
 # ============================================================
 
-st.set_page_config(page_title="Charagah Inspection Dashboard", layout="wide")
 
 st.markdown("""
 <style>
@@ -419,7 +418,7 @@ def remove_duplicates(df_raw):
         df_raw["created_at"] = pd.to_datetime(df_raw["created_at"], errors="coerce")
 
     # Create a date-only column
-    df_raw["created_date"] = df_raw["created_at"].dt.date
+    #df_raw["created_date"] = df_raw["created_at"].dt.date
 
     # Sort so newest submissions appear first
     df_raw = df_raw.sort_values(by="created_at", ascending=False)
@@ -432,7 +431,7 @@ def remove_duplicates(df_raw):
         df_raw = df_raw.drop_duplicates(subset=["village", "created_date"], keep="first")
 
     # Remove helper column
-    df_raw = df_raw.drop(columns=["created_date"], errors="ignore")
+    #df_raw = df_raw.drop(columns=["created_date"], errors="ignore")
 
     # Summary info
     st.info(f"✅ Cleaned data: {len(df_raw)} unique (latest) submissions per village per day.")
@@ -441,7 +440,7 @@ def remove_duplicates(df_raw):
 # ----------------------------
 # LOAD GOOGLE SHEET + RENAME
 # ----------------------------
-st.set_page_config(page_title="Goshala Dashboard", layout="wide")
+#st.set_page_config(page_title="Goshala Dashboard", layout="wide")
 st.title("🐄 Goshala Inspection Dashboard")
 
 with st.spinner("Loading Google Sheet..."):
@@ -475,14 +474,18 @@ COLUMN_RENAME_MAP = {
     "Time": "time",
     "GPS Location inspection": "gps_inspection",
 }
+
+
 df_raw.columns = df_raw.columns.str.strip()
 df_raw = df_raw.rename(columns=COLUMN_RENAME_MAP)
 
 # Extract date/time
 if "created_at" in df_raw.columns:
+    #st.markdown("created_at column found")
     df_raw["created_at"] = pd.to_datetime(df_raw["created_at"], errors="coerce")
     df_raw["created_date"] = df_raw["created_at"].dt.date
     df_raw["created_time"] = df_raw["created_at"].dt.time
+    #st.markdown(f"created_at: {df_raw["created_date"]}")
 
 # Parse GPS coordinates
 if "plot_gps_location" in df_raw.columns:
@@ -540,12 +543,51 @@ tab1, tab2 = st.tabs(["1️⃣ Last Inspection", "2️⃣ Progress Monitoring"])
 with tab1:
     #st.header("📅 Last Inspection Overview")
     #st.markdown("<h2 '>📅 Last Inspection Overview</h2>", unsafe_allow_html=True)
-
+    #st.markdown(f"{df_raw.columns}")
     if "created_date" in df_raw.columns and df_raw["created_date"].notna().any():
-        min_date, max_date = df_raw["created_date"].min(), df_raw["created_date"].max()
-        start, end = st.date_input("Select date range", (min_date, max_date))
-        df_last = df_raw[(df_raw["created_date"] >= start) & (df_raw["created_date"] <= end)]
+        # ================================
+        # 📅 Date Range Selector (Styled Full-Width)
+        # ================================
+
+        # ================================
+        # ================================
+        # 📅 Simple Date Range Selector (40/60 Layout)
+        # ================================
+        from datetime import date
+
+        # Ensure proper date parsing
+        df_raw["created_date"] = pd.to_datetime(df_raw["created_date"], errors="coerce")
+        min_date = df_raw["created_date"].min()
+        max_date = df_raw["created_date"].max()
+        min_date = min_date.date() if hasattr(min_date, "date") else min_date
+        max_date = max_date.date() if hasattr(max_date, "date") else max_date
+
+        # Create a two-column layout: 40% title, 60% date input
+        col1, col2 = st.columns([0.4, 0.6])
+
+        with col1:
+            st.markdown(
+                "<h5 style='text-align:right; margin-top:2rem;'>📅 Select date range of inspection</h5>",
+                unsafe_allow_html=True
+            )
+
+        with col2:
+            start, end = st.date_input(
+                label="",
+                value=(min_date, max_date),
+                min_value=min_date,
+                max_value=max_date,
+                key="date_selector"
+            )
+
+        # Filter dataframe based on selected date range
+        df_last = df_raw[
+            (df_raw["created_date"] >= pd.to_datetime(start))
+            & (df_raw["created_date"] <= pd.to_datetime(end))
+        ]
+
     else:
+        st.markdown("no created_date column found so no date selector")
         df_last = df_raw.copy()
 
     
@@ -1023,30 +1065,14 @@ with tab1:
                 dfm["area_%"] = (dfm["area_actual_cultivated"] / dfm["plot_area"] * 100).replace([np.inf, -np.inf], np.nan).fillna(0)
                 dfm["production_%"] = (dfm["area_%"] * (dfm["crop_quality"] / 5)).fillna(0)
 
+                
+                # -----------------------------
                 # ================================
-                # 🎛️ MAP MODE SELECTION (Green Pills)
+                # 🎛️ MAP MODE SELECTION (Green Tab Buttons)
                 # ================================
-                st.markdown("""
-                <style>
-                .mode-container {
-                    display: flex; justify-content: center; gap: 1rem; margin: 1rem 0;
-                }
-                .mode-button {
-                    background-color: #E8F5E9;
-                    border: 2px solid #15803D;
-                    color: #166534;
-                    font-weight: 600;
-                    padding: 8px 20px;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .mode-button:hover, .mode-button.active {
-                    background-color: #15803D;
-                    color: white;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+                # ================================
+                # 🎛️ MAP MODE SELECTION (Green Tab Buttons - Fully Functional)
+                # ================================
 
                 modes = [
                     "Inspection Status",
@@ -1055,16 +1081,82 @@ with tab1:
                     "Expected Production (%)"
                 ]
 
-                selected_mode = st.session_state.get("map_mode", modes[0])
+                # --- Remember selected mode in session ---
+                if "map_mode" not in st.session_state:
+                    st.session_state.map_mode = modes[0]
+
+                # --- Custom CSS styling ---
+                st.markdown("""
+                <style>
+                .mode-tabs {
+                    display: flex;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    margin-bottom: 18px;
+                    margin-top: -30px;
+                }
+                div[data-testid="stButton"] > button {
+                    border-radius: 10px !important;
+                    padding: -30px 18px !important;
+                    border: 2px solid #15803D !important;
+                    background-color: #E8F5E9 !important;
+                    color: #166534 !important;
+                    font-weight: 600 !important;
+                    transition: all 0.2s ease;
+                }
+                div[data-testid="stButton"] > button:hover {
+                    background-color: #bbf7d0 !important;
+                }
+                div[data-testid="stButton"].active > button {
+                    background-color: #166534 !important;
+                    color: white !important;
+                    border-color: #166534 !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+                # --- Render as Streamlit buttons in columns ---
                 cols = st.columns(len(modes))
                 for i, m in enumerate(modes):
-                    active = "active" if m == selected_mode else ""
-                    if cols[i].button(m, key=f"mode_{i}"):
-                        st.session_state["map_mode"] = m
-                        selected_mode = m
-                        st.rerun()
+                    with cols[i]:
+                        # Highlight active one
+                        container_class = "active" if st.session_state.map_mode == m else ""
+                        st.markdown(f'<div class="{container_class}">', unsafe_allow_html=True)
+                        if st.button(m, key=f"mode_{i}"):
+                            st.session_state.map_mode = m
+                        st.markdown("</div>", unsafe_allow_html=True)
 
-                map_mode = selected_mode
+                # --- Selected mode ---
+                map_mode = st.session_state.map_mode
+
+
+                # ================================
+                # 🏷️ Dynamic Map Title (Matches Theme)
+                # ================================
+                map_titles = {
+                    "Inspection Status": "🗺️ Inspection Status Map",
+                    "Area under Cultivation (%)": "🌾 Cultivation Coverage Map",
+                    "Quality of Cultivation (1–5)": "📈 Crop Quality Map",
+                    "Expected Production (%)": "📊 Expected Production Map"
+                }
+
+                map_subtitles = {
+                    "Inspection Status": "Color-coded by inspecting officer type (BDO, CVO, Secretary, etc.)",
+                    "Area under Cultivation (%)": "Based on the ratio of actual cultivated area to total land area",
+                    "Quality of Cultivation (1–5)": "Derived from average crop condition ratings (1–5 scale)",
+                    "Expected Production (%)": "Calculated as Area% × Quality Score"
+                }
+
+                # --- Styled title ---
+                st.markdown(f"""
+                <div style='text-align:center; margin-top:0px; margin-bottom:0px;'>
+                    <h4 style='color:#166534; font-weight:700; margin-bottom:0px;'>{map_titles.get(map_mode, '🗺️ Map View')}</h4>
+                    <p style='color:#4b5563; font-size:15px;'>{map_subtitles.get(map_mode, '')}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
 
                 # ================================
                 # 🧭 HOVER TEXT BUILDER
@@ -1274,7 +1366,7 @@ with tab1:
                 </div>
                 """
 
-                st_html(zoom_html, height=740)
+                st_html(zoom_html, height=700)
 
                 # ================================
                 # 📋 DATA TABLE BELOW MAP
