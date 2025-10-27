@@ -1,4 +1,4 @@
-# app.py
+# charagah_inspection_v6.py
 """
 🐄 Goshala Inspection Dashboard — Final Integrated Version
 Features:
@@ -78,7 +78,7 @@ hide_streamlit_branding = """
 st.markdown(hide_streamlit_branding, unsafe_allow_html=True)
 
 #remove top padding
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="गोशाला चरागाह निरीक्षण Dashboard V6 - ui", layout="wide")
 st.markdown("""
     <style>
         div.block-container { padding-top: 0rem !important; }
@@ -91,7 +91,7 @@ st.markdown("""
 # ----------------------------
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1K0KxYzI7td53UmLu_5ZeK9_FDk1UoD0h0IpUYTg1mmY/edit?usp=sharing"
 GOOGLE_DRIVE_FOLDER_ID = "1SO-p_yU7ARjEsMIcEqu7m2T8Dh2Bt4BJ"
-BASELINE_PATH = "baseline_static_data.xlsx"
+BASELINE_PATH = "baseline_static_data.XLSX"
 
 # ----------------------------
 # LOAD CREDENTIALS
@@ -101,6 +101,180 @@ try:
 except Exception:
     st.error("❌ Missing Google service account credentials in st.secrets['gcp_service_account'].")
     st.stop()
+
+# ============================================================
+# 🌿 GREEN THEME UI SETUP (Cyber Dashboard Style)
+# ============================================================
+
+# ============================================================
+# 🌿 GREEN THEME UI (Cyber Dashboard Style)
+# ============================================================
+
+st.set_page_config(page_title="Charagah Inspection Dashboard", layout="wide")
+
+st.markdown("""
+<style>
+/* --- GENERAL PAGE --- */
+body, .main {
+    background-color: #f6faf6;
+    font-family: 'Inter', sans-serif;
+}
+section[data-testid="stSidebar"] {
+    background-color: #14532D;
+    color: white;
+}
+h1, h2, h3, h4, h5 {
+    color: #166534 !important;
+    font-weight: 700;
+    text-align: center !important;
+    margin-top: -2rem;
+    margin-bottom: -2rem;
+}
+
+.block-container {
+    padding-top: 0.5rem;
+    padding-bottom: -2rem;
+}
+            
+
+/* --- TABS --- */
+            
+div[data-baseweb="tab-list"] {
+    background-color: #E7F8E7;
+    border-radius: 10px 10px 0 0;
+    padding: -16px 10px;
+    width: 100%;   
+    display: flex;          
+}
+div[data-baseweb="tab-list"] button {
+    flex-grow: 1;         /* Makes all buttons grow equally */
+    text-align: center;   /* Centers text inside the expanded buttons */
+    margin-right: 0;      /* Remove the button margin for a cleaner look */
+
+    background-color: transparent;
+    border: none;
+    color: #166534;
+    font-weight: 600;
+    padding: 8px 20px;
+    margin-right: 8px;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+}
+div[data-baseweb="tab-list"] button:hover {
+    background-color: #22C55E20;
+}
+div[data-baseweb="tab-list"] button[aria-selected="true"] {
+    background-color: #15803D !important;
+    color: white !important;
+}
+
+/* ----- map css ----- */
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 15px 0 25px 0;
+}
+.mode-button {
+    background-color: #E8F5E9;
+    border: 2px solid #166534;
+    color: #166534;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.mode-button:hover {
+    background-color: #166534;
+    color: white;
+}
+.mode-button.active {
+    background-color: #166534;
+    color: white;
+}
+
+
+/* --- CARD CONTAINERS --- */
+.card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.5rem;
+}
+
+/* --- TABLE STYLING --- */
+[data-testid="stDataFrame"] table {
+    border-collapse: collapse !important;
+    border-radius: 10px;
+}
+thead tr th {
+    background-color: #D1FAE5 !important;
+    color: #14532D !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+}
+tbody tr td {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* --- METRICS --- */
+div[data-testid="stMetricValue"] {
+    color: #15803D !important;
+    font-weight: bold;
+}
+            
+/* footer section */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #E7F8E7; /* Match your tab color */
+    color: #166534; /* Match your text color */
+    text-align: center;
+    padding: 10px 0; /* Add some padding for height */
+    z-index: 100; /* Ensure it's on top of other content */
+}
+.section-divider {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* All unvisited links will be green */
+a:link {
+  color: #166534;
+}
+
+/* Visited links will also be green to ensure consistency */
+a:visited {
+  color: #166534;
+}
+
+/* Links will turn a darker green when the mouse hovers over them */
+a:hover {
+  color: #166534;
+}
+
+/* Links will turn an even darker green when being clicked */
+a:active {
+  color: #166534;
+}
+                        
+
+                        
+</style>
+<div class='section-divider'></div>
+<div class='footer'>
+    <a href="https://devdev.clappia.com/app/YRX813600"  title="निरीक्षण फॉर्म के लिए यहाँ क्लिक करें" target="_blank" class='footer'>
+        © CDO Office Shahjahanpur · गोशाला गोचर भूमि निरीक्षण Dashboard
+    </a>
+</div>
+""", unsafe_allow_html=True)
+
 
 # ----------------------------
 # HELPER FUNCTIONS
@@ -353,6 +527,8 @@ with st.spinner("Loading baseline reference data..."):
         st.sidebar.warning("⚠️ Baseline file not found.")
         df_base = pd.DataFrame()
 
+
+
 # ----------------------------
 # MAIN DASHBOARD
 # ----------------------------
@@ -362,7 +538,8 @@ tab1, tab2 = st.tabs(["1️⃣ Last Inspection", "2️⃣ Progress Monitoring"])
 # TAB 1 — LAST INSPECTION
 # ----------------------------
 with tab1:
-    st.header("📅 Last Inspection Overview")
+    #st.header("📅 Last Inspection Overview")
+    #st.markdown("<h2 '>📅 Last Inspection Overview</h2>", unsafe_allow_html=True)
 
     if "created_date" in df_raw.columns and df_raw["created_date"].notna().any():
         min_date, max_date = df_raw["created_date"].min(), df_raw["created_date"].max()
@@ -384,9 +561,17 @@ with tab1:
 
     # --- Overview ---
     # --- Overview ---
+ #   with sub_overview:
+#        st.subheader("📊 Block-wise Inspection Overview")
     with sub_overview:
-        st.subheader("📊 Block-wise Inspection Overview")
-        st.markdown("---")
+        #st.markdown('<div class="card">', unsafe_allow_html=True)
+        #st.subheader("📊 Block-wise Inspection Overview")
+        #st.markdown("<h3 >📊 Block-wise Inspection Overview</h3>", unsafe_allow_html=True)
+
+        
+        #st.markdown('</div>', unsafe_allow_html=True)
+
+        #st.markdown("---")
         if "block" in df_last.columns:
             # Prepare baseline (required) and actual (submitted) counts
             base_counts = (
@@ -601,7 +786,8 @@ with tab1:
     # --- Area ---
     # --- Area Subtab ---
     with sub_area:
-        st.subheader("🌾 Area and Production Analysis (Block-wise)")
+        #st.subheader("🌾 Area and Production Analysis (Block-wise)")
+        st.markdown("<h3 >🌾 Area and Production Analysis (Block-wise)</h3>", unsafe_allow_html=True)
 
 
         
@@ -643,6 +829,7 @@ with tab1:
         #total_production = (block_agg["production_%"].mean())
         total_production = ( total_cultivated / total_area ) * (total_quality / 5 ) * 100
 
+        st.markdown("---")
         # --- PIE CHARTS (Aggregate Overview) ---
         st.markdown("### 📊 Overall Aggregation")
         col1, col2, col3, col4 = st.columns(4)
@@ -743,7 +930,7 @@ with tab1:
             use_container_width=True,
             key="total_area_cultivated_bar"
         )
-
+        st.markdown("---")
         st.dataframe(block_agg[["block", "total_plot_area", "total_cultivated", "cultivated_%"]].sort_values(by="cultivated_%", ascending=False))
 
         # Excel download
@@ -751,6 +938,7 @@ with tab1:
         with pd.ExcelWriter(out_cult, engine="openpyxl") as w:
             block_agg.to_excel(w, index=False, sheet_name="area_cultivated")
         st.download_button("📥 Download Cultivated Area Data", out_cult.getvalue(), "blockwise_cultivated_area.xlsx")
+        st.markdown("---")
 
         # =========================================================
         # 2️⃣ QUALITY OF CULTIVATED AREA (BLOCK-WISE)
@@ -774,13 +962,15 @@ with tab1:
             use_container_width=True,
             key="average_crop_quality_bar"
         )
-
+        st.markdown("---")
         st.dataframe(block_agg[["block", "avg_quality", "quality_%"]].sort_values(by="quality_%", ascending=False))
 
         out_quality = BytesIO()
         with pd.ExcelWriter(out_quality, engine="openpyxl") as w:
             block_agg.to_excel(w, index=False, sheet_name="quality")
         st.download_button("📥 Download Quality Data", out_quality.getvalue(), "blockwise_quality_data.xlsx")
+
+        st.markdown("---")
 
         # =========================================================
         # 3️⃣ TOTAL PRODUCTION EXPECTED (BLOCK-WISE)
@@ -804,7 +994,7 @@ with tab1:
             use_container_width=True,
             key="expected_production_bar"
         )
-
+        st.markdown("---")
         st.dataframe(block_agg[["block", "production_%"]].sort_values(by="production_%", ascending=False))
 
         out_prod = BytesIO()
@@ -814,8 +1004,9 @@ with tab1:
 
     # --- Map ---
     # --- MAP SUBTAB ---
+    # --- MAP SUBTAB ---
     with sub_map:
-        st.subheader("🗺️ Inspection Map with Mode Options")
+        st.markdown('<div class="card">', unsafe_allow_html=True)
 
         if {"latitude", "longitude"} <= set(df_last.columns):
             dfm = df_last.dropna(subset=["latitude", "longitude"]).copy()
@@ -823,106 +1014,273 @@ with tab1:
             if dfm.empty:
                 st.warning("⚠️ No valid GPS coordinates available for mapping.")
             else:
-                # --- Compute required metrics for mapping ---
+                # --- Numeric Cleanup ---
                 dfm["plot_area"] = pd.to_numeric(dfm.get("plot_area", 0), errors="coerce").fillna(0)
                 dfm["area_actual_cultivated"] = pd.to_numeric(dfm.get("area_actual_cultivated", 0), errors="coerce").fillna(0)
                 dfm["crop_quality"] = pd.to_numeric(dfm.get("crop_quality", 0), errors="coerce").fillna(0)
 
-                # Derived metrics
+                # --- Derived Metrics ---
                 dfm["area_%"] = (dfm["area_actual_cultivated"] / dfm["plot_area"] * 100).replace([np.inf, -np.inf], np.nan).fillna(0)
-                dfm["production_%"] = (dfm["area_%"] * (dfm["crop_quality"] / 5 ) ).fillna(0)
+                dfm["production_%"] = (dfm["area_%"] * (dfm["crop_quality"] / 5)).fillna(0)
 
-                # --- Map Center (Safe) ---
-                lat_mean = dfm["latitude"].mean(skipna=True)
-                lon_mean = dfm["longitude"].mean(skipna=True)
-                if pd.isna(lat_mean) or pd.isna(lon_mean):
-                    lat_mean, lon_mean = 27.5, 80.5  # fallback
-                m = folium.Map(location=[lat_mean, lon_mean], zoom_start=11)
+                # ================================
+                # 🎛️ MAP MODE SELECTION (Green Pills)
+                # ================================
+                st.markdown("""
+                <style>
+                .mode-container {
+                    display: flex; justify-content: center; gap: 1rem; margin: 1rem 0;
+                }
+                .mode-button {
+                    background-color: #E8F5E9;
+                    border: 2px solid #15803D;
+                    color: #166534;
+                    font-weight: 600;
+                    padding: 8px 20px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .mode-button:hover, .mode-button.active {
+                    background-color: #15803D;
+                    color: white;
+                }
+                </style>
+                """, unsafe_allow_html=True)
 
-                # --- Map Mode Selection ---
-                st.markdown("### 🗺️ Select Map View Mode")
-                mode = st.radio(
-                    "Select visualization type:",
-                    [
-                        "Inspection Status",
-                        "Area under Cultivation (%)",
-                        "Quality of Cultivation (1–5)",
-                        "Expected Production (%)"
-                    ],
-                    horizontal=True
-                )
+                modes = [
+                    "Inspection Status",
+                    "Area under Cultivation (%)",
+                    "Quality of Cultivation (1–5)",
+                    "Expected Production (%)"
+                ]
 
-                # --- Helper: Color logic for each mode ---
+                selected_mode = st.session_state.get("map_mode", modes[0])
+                cols = st.columns(len(modes))
+                for i, m in enumerate(modes):
+                    active = "active" if m == selected_mode else ""
+                    if cols[i].button(m, key=f"mode_{i}"):
+                        st.session_state["map_mode"] = m
+                        selected_mode = m
+                        st.rerun()
+
+                map_mode = selected_mode
+
+                # ================================
+                # 🧭 HOVER TEXT BUILDER
+                # ================================
+                def make_hover_text(row):
+                    parts = [f"<b>📍 Block:</b> {row['block']}", f"<b>Village:</b> {row['village']}"]
+                    if row.get("officer_name"):
+                        parts.append(f"<b>Officer:</b> {row['officer_name']} ({row.get('officer_designation','')})")
+                    parts.append(f"<b>Plot Area:</b> {row['plot_area']:.2f} ha")
+                    parts.append(f"<b>Area Cultivated:</b> {row['area_actual_cultivated']:.2f} ha")
+                    parts.append(f"<b>Area %:</b> {row['area_%']:.1f}%")
+                    parts.append(f"<b>Quality:</b> {row['crop_quality']:.1f}")
+                    parts.append(f"<b>Production %:</b> {row['production_%']:.1f}%")
+                    if row.get("created_at"):
+                        parts.append(f"<b>Date:</b> {str(row['created_at']).split(' ')[0]}")
+                    return "<br>".join(parts)
+
+                dfm["hover_text"] = dfm.apply(make_hover_text, axis=1)
+
+                # ================================
+                # 🎨 COLOR LOGIC
+                # ================================
                 def get_color(row):
-                    if mode == "Inspection Status":
-                        desig = str(row.get("officer_designation", "")).strip()
-                        if not desig or desig == "nan":
+                    if map_mode == "Inspection Status":
+                        d = str(row.get("officer_designation", "")).upper()
+                        if not d or d == "NAN":
                             return "black"
-                        elif "BDO" in desig.upper():
+                        elif "BDO" in d:
                             return "blue"
-                        elif "CVO" in desig.upper():
+                        elif "CVO" in d:
                             return "green"
-                        elif "सचिव" in desig or "SEC" in desig.upper():
+                        elif "सचिव" in d or "SEC" in d:
                             return "red"
                         else:
                             return "gray"
-
-                    elif mode == "Area under Cultivation (%)":
-                        val = row["area_%"]
-                        if val < 50:
-                            return "red"
-                        elif val < 80:
-                            return "blue"
-                        else:
-                            return "green"
-
-                    elif mode == "Quality of Cultivation (1–5)":
-                        val = row["crop_quality"]
-                        if val <= 2:
-                            return "red"
-                        elif val <= 4:
-                            return "blue"
-                        else:
-                            return "green"
-
-                    elif mode == "Expected Production (%)":
-                        val = row["production_%"]
-                        if val < 50:
-                            return "red"
-                        elif val < 80:
-                            return "blue"
-                        else:
-                            return "green"
-
+                    elif map_mode == "Area under Cultivation (%)":
+                        v = row["area_%"]
+                        return "red" if v < 50 else "blue" if v < 80 else "green"
+                    elif map_mode == "Quality of Cultivation (1–5)":
+                        q = row["crop_quality"]
+                        return "red" if q <= 2 else "blue" if q <= 4 else "green"
+                    elif map_mode == "Expected Production (%)":
+                        p = row["production_%"]
+                        return "red" if p < 50 else "blue" if p < 80 else "green"
                     return "gray"
 
-                # --- Add Markers to Map ---
-                for _, r in dfm.iterrows():
-                    color = get_color(r)
-                    popup_text = (
-                        f"<b>Block:</b> {r.get('block','')}<br>"
-                        f"<b>Village:</b> {r.get('village','')}<br>"
-                        f"<b>Officer:</b> {r.get('officer_name','')} ({r.get('officer_designation','')})<br>"
-                        f"<b>Area Cultivated %:</b> {r.get('area_%',0):.1f}%<br>"
-                        f"<b>Quality:</b> {r.get('crop_quality',0):.1f}<br>"
-                        f"<b>Production %:</b> {r.get('production_%',0):.1f}%"
+                dfm["color"] = dfm.apply(get_color, axis=1)
+
+                # ================================
+                # 🗺️ BUILD PLOTLY MAP
+                # ================================
+                import plotly.graph_objects as go
+
+                # Define color mapping for current mode
+                if map_mode == "Inspection Status":
+                    color_map = {
+                        "Not Done": "black",
+                        "BDO": "blue",
+                        "CVO": "green",
+                        "सचिव": "red"
+                    }
+
+                    def classify(row):
+                        d = str(row.get("officer_designation", "")).upper()
+                        if not d or d == "NAN":
+                            return "Not Done"
+                        elif "BDO" in d:
+                            return "BDO"
+                        elif "CVO" in d:
+                            return "CVO"
+                        elif "सचिव" in d or "SEC" in d:
+                            return "सचिव"
+                        return "Other"
+
+                    dfm["category"] = dfm.apply(classify, axis=1)
+
+                elif map_mode == "Area under Cultivation (%)":
+                    color_map = {"< 50%": "red", "50–80%": "blue", "> 80%": "green"}
+
+                    def classify(row):
+                        val = row["area_%"]
+                        if val < 50:
+                            return "< 50%"
+                        elif val < 80:
+                            return "50–80%"
+                        else:
+                            return "> 80%"
+
+                    dfm["category"] = dfm.apply(classify, axis=1)
+
+                elif map_mode == "Quality of Cultivation (1–5)":
+                    color_map = {"<= 2": "red", "<= 4": "blue", "> 4": "green"}
+
+                    def classify(row):
+                        q = row["crop_quality"]
+                        if q <= 2:
+                            return "<= 2"
+                        elif q <= 4:
+                            return "<= 4"
+                        else:
+                            return "> 4"
+
+                    dfm["category"] = dfm.apply(classify, axis=1)
+
+                else:  # Expected Production
+                    color_map = {"< 50%": "red", "< 80%": "blue", "> 80%": "green"}
+
+                    def classify(row):
+                        p = row["production_%"]
+                        if p < 50:
+                            return "< 50%"
+                        elif p < 80:
+                            return "< 80%"
+                        else:
+                            return "> 80%"
+
+                    dfm["category"] = dfm.apply(classify, axis=1)
+
+                # --- Build figure with multiple traces (one per category) ---
+                fig = go.Figure()
+
+                # --- Center and Zoom Control ---
+                if not dfm.empty:
+                    center_lat = dfm["latitude"].mean()
+                    center_lon = dfm["longitude"].mean()
+                else:
+                    center_lat, center_lon = 27.5, 80.5  # fallback (UP region default)
+
+                fig.update_layout(
+                    mapbox=dict(
+                        style="open-street-map",
+                        center=dict(lat=center_lat, lon=center_lon),
+                        zoom=9
                     )
+                )
 
-                    folium.CircleMarker(
-                        location=[r["latitude"], r["longitude"]],
-                        radius=6,
-                        color=color,
-                        fill=True,
-                        fill_color=color,
-                        fill_opacity=0.9,
-                        popup=folium.Popup(popup_text, max_width=250)
-                    ).add_to(m)
 
-                st_folium(m, width=1000, height=600)
+                for label, color in color_map.items():
+                    df_cat = dfm[dfm["category"] == label]
+                    if not df_cat.empty:
+                        fig.add_trace(go.Scattermapbox(
+                            lat=df_cat["latitude"],
+                            lon=df_cat["longitude"],
+                            mode="markers",
+                            marker=dict(size=22, color=color, opacity=0.85),
+                            text=df_cat["hover_text"],
+                            hovertemplate="%{text}<extra></extra>",
+                            name=label
+                        ))
 
-                # --- Data Table for plotted points ---
-                st.markdown("### 📋 Data Used in Map Visualization")
+                # --- Layout & Legend ---
+                fig.update_layout(
+                    mapbox_style="open-street-map",
+                    margin={"r": 0, "t": 0, "l": 0, "b": 0},
+                    legend_title_text="Click to Toggle Layers",
+                    legend=dict(
+                        orientation="v",
+                        yanchor="top",
+                        y=0.9,
+                        xanchor="left",
+                        x=0.8,
+                        bgcolor="rgba(255,255,255,0.85)",
+                        bordercolor="#15803D",
+                        borderwidth=1,
+                        font=dict(size=13, color="#166534")
+                    ),
+                    legend_itemclick="toggle",
+                    legend_itemdoubleclick="toggleothers",
+                    height=650,
+                    
+                )
 
+
+                # ================================
+                # 🧭 HTML BORDER + ZOOM BUTTONS
+                # ================================
+                from streamlit.components.v1 import html as st_html
+
+                zoom_html = f"""
+                <div style="position: relative; border:4px solid #15803D; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+
+                <div id="plotly-map" style="height:650px; width:100%;">
+                    {fig.to_html(include_plotlyjs='cdn', full_html=False, div_id='plotly-map')}
+                </div>
+
+                <div style="position:absolute;top:20px;left:20px;display:flex;flex-direction:column;gap:8px;z-index:999;">
+                    <button id="zoom-in" style="background:white;border:2px solid #15803D;color:#15803D;font-size:22px;border-radius:6px;width:44px;height:44px;cursor:pointer;">+</button>
+                    <button id="zoom-out" style="background:white;border:2px solid #15803D;color:#15803D;font-size:26px;border-radius:6px;width:44px;height:44px;cursor:pointer;">−</button>
+                </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {{
+                    const mapDiv = document.getElementById('plotly-map');
+                    if (!mapDiv) return;
+                    function getZoom() {{
+                        const layout = mapDiv._fullLayout || {{}};
+                        return layout.mapbox?.zoom || 9;
+                    }}
+                    function zoom(delta) {{
+                        const newZoom = getZoom() + delta;
+                        Plotly.relayout(mapDiv, {{'mapbox.zoom': newZoom}});
+                    }}
+                    document.getElementById('zoom-in').addEventListener('click', () => zoom(+0.5));
+                    document.getElementById('zoom-out').addEventListener('click', () => zoom(-0.5));
+                }});
+                </script>
+                </div>
+                """
+
+                st_html(zoom_html, height=740)
+
+                # ================================
+                # 📋 DATA TABLE BELOW MAP
+                # ================================
+                st.markdown("---")
+                st.markdown("#### 📋 Data Used in Map Visualization")
                 display_cols = [
                     "block", "village", "officer_name", "officer_designation",
                     "plot_area", "area_actual_cultivated", "area_%", "crop_quality",
@@ -930,309 +1288,36 @@ with tab1:
                 ]
                 display_cols = [c for c in display_cols if c in dfm.columns]
 
-                table_df = dfm[display_cols].copy().round(2)
-                st.dataframe(table_df, use_container_width=True)
+                st.dataframe(
+                    dfm[display_cols].round(2).style.set_properties(**{
+                        'text-align': 'center',
+                        'vertical-align': 'middle'
+                    }),
+                    use_container_width=True
+                )
 
-                # --- Download Button for Map Data ---
                 out_map = BytesIO()
                 with pd.ExcelWriter(out_map, engine="openpyxl") as w:
-                    table_df.to_excel(w, index=False, sheet_name="map_data")
+                    dfm[display_cols].to_excel(w, index=False, sheet_name="map_data")
                 st.download_button(
                     "📥 Download Map Data (Excel)",
                     out_map.getvalue(),
                     "inspection_map_data.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+
         else:
-            st.warning("No GPS columns ('latitude', 'longitude') found in dataset.")
+            st.warning("⚠️ No GPS columns ('latitude', 'longitude') found in dataset.")
 
-
-
-    # --- Photo ---
-    # --- PHOTO SUBTAB ---
-    # --- PHOTO SUBTAB ---
-    with sub_photo:
-        st.subheader("📸 Photo Analytics — From Submission Data")
-
-        # ================================================================
-        # 1️⃣ Extract Filenames from Clappia URLs
-        # ================================================================
-        import re
-
-        def extract_filename_from_url(url):
-            """Extract image filename (e.g., IMG-20251026_2218ik0da.jpeg) from any URL."""
-            if not isinstance(url, str) or not url:
-                return None
-            match = re.search(r"(IMG-[\d_]+[a-zA-Z0-9]+\.jpe?g)", url)
-            return match.group(1) if match else None
-
-        df_last["photo_selfie_name"] = df_last["photo_selfie"].apply(extract_filename_from_url)
-        df_last["photo_field_name"] = df_last["photo_field"].apply(extract_filename_from_url)
-
-        # ================================================================
-        # 2️⃣ Load Drive Photos & Match by Filename
-        # ================================================================
-        drive_folder_id = "1SO-p_yU7ARjEsMIcEqu7m2T8Dh2Bt4BJ"  # your folder ID
-        try:
-            df_drive = fetch_drive_photos(folder_id=drive_folder_id, _creds_json=st.secrets["gcp_service_account"])
-            st.success(f"✅ Loaded {len(df_drive)} photos from Google Drive.")
-        except Exception as e:
-            st.error(f"❌ Failed to load Drive photos: {e}")
-            df_drive = pd.DataFrame(columns=["file_name", "public_url"])
-
-        # Map Drive filenames to public URLs
-        drive_map = dict(zip(df_drive["file_name"], df_drive["public_url"]))
-        df_last["photo_selfie_url"] = df_last["photo_selfie_name"].map(drive_map)
-        df_last["photo_field_url"] = df_last["photo_field_name"].map(drive_map)
-
-        # Debug preview
-        with st.expander("🧪 Debug: Drive Matching Preview"):
-            st.dataframe(df_last[["village", "photo_selfie_name", "photo_selfie_url",
-                                "photo_field_name", "photo_field_url"]].head(10))
-
-        # ================================================================
-        # 3️⃣ Clean numeric fields for analysis
-        # ================================================================
-        df_last["plot_area"] = pd.to_numeric(df_last.get("plot_area", 0), errors="coerce").fillna(0)
-        df_last["area_actual_cultivated"] = pd.to_numeric(df_last.get("area_actual_cultivated", 0), errors="coerce").fillna(0)
-        df_last["crop_quality"] = pd.to_numeric(df_last.get("crop_quality", 0), errors="coerce").fillna(0)
-        df_last["area_%"] = (df_last["area_actual_cultivated"] / df_last["plot_area"] * 100).clip(0, 100)
-
-        # ================================================================
-        # 4️⃣ Build Block Tabs
-        # ================================================================
-        blocks = sorted(df_last["block"].dropna().unique())
-        if not blocks:
-            st.warning("⚠️ No block data available.")
-        else:
-            st.markdown("### 🏢 Select a Block to View Photo & Metrics")
-            block_tabs = st.tabs(blocks)
-
-            for b_i, block in enumerate(blocks):
-                with block_tabs[b_i]:
-                    st.markdown(f"## 🏢 Block: {block}")
-                    df_block = df_last[df_last["block"] == block].copy()
-
-                    # --- Block Aggregates ---
-                    total_area = df_block["plot_area"].sum()
-                    total_cult = df_block["area_actual_cultivated"].sum()
-                    avg_quality = df_block["crop_quality"].mean()
-                    total_req = df_base[df_base["block"] == block].shape[0] if "block" in df_base.columns else 0
-                    actual_done = df_block["village"].nunique()
-                    remaining = max(total_req - actual_done, 0)
-
-                    # --- Block Summary Charts ---
-                    st.markdown("### 📊 Block Summary Charts")
-                    c1, c2, c3 = st.columns(3)
-                    with c1:
-                        fig_q = px.pie(
-                            names=["Avg Quality", "Remaining"],
-                            values=[avg_quality * 20, 100 - (avg_quality * 20)],
-                            title="Average Quality (%)",
-                            color_discrete_sequence=["lightgray", "green"]
-                        )
-
-                        st.plotly_chart(
-                            fig_q,
-                            config={"displayModeBar": False, "responsive": True},
-                            use_container_width=True,
-                            key=f"avg_quality_{block}"
-                        )
-
-                    with c2:
-                        cultivated_pct = (total_cult / total_area * 100) if total_area > 0 else 0
-
-                        fig_a = px.pie(
-                            names=["Cultivated", "Uncultivated"],
-                            values=[cultivated_pct, 100 - cultivated_pct],
-                            title="Total Area Cultivated (%)",
-                            color_discrete_sequence=["lightgray", "blue"]
-                        )
-
-                        st.plotly_chart(
-                            fig_a,
-                            config={"displayModeBar": False, "responsive": True},
-                            use_container_width=True,
-                            key=f"area_cult_{block}"
-                        )
-
-                    with c3:
-                        fig_i = px.pie(
-                            names=["Inspected", "Pending"],
-                            values=[actual_done, remaining],
-                            title="Inspections Completed",
-                            color_discrete_sequence=["lightgray", "red"]
-                        )
-
-                        st.plotly_chart(
-                            fig_i,
-                            config={"displayModeBar": False, "responsive": True},
-                            use_container_width=True,
-                            key=f"inspect_done_{block}"
-                        )
-
-                    st.markdown("---")
-
-                    # ================================================================
-                    # 5️⃣ Village-Level Photo Display
-                    # ================================================================
-                    villages = sorted(df_block["village"].dropna().unique())
-                    for v in villages:
-                        st.markdown(f"### 📍 Village: {v}")
-                        df_v = df_block[df_block["village"] == v].copy()
-
-                        st.markdown("#### 🖼️ Photos")
-                        cols = st.columns(4)
-                        photo_urls = pd.concat([
-                            df_v["photo_selfie_url"].dropna(),
-                            df_v["photo_field_url"].dropna()
-                        ]).unique()
-
-                        if len(photo_urls) == 0:
-                            st.warning("⚠️ No matching Drive photos found for this village.")
-                        else:
-
-                            #display image iteration loop
-
-                            import requests
-                            from io import BytesIO
-                            from PIL import Image
-
-                            for i, url in enumerate(photo_urls):
-                                if isinstance(url, str) and url.startswith("http"):
-                                    # --- Extract file ID from any Google Drive link format ---
-                                    file_id = None
-                                    patterns = [
-                                        r"id=([a-zA-Z0-9_-]+)",
-                                        r"/d/([a-zA-Z0-9_-]+)",
-                                        r"uc\?id=([a-zA-Z0-9_-]+)",
-                                        r"download\?id=([a-zA-Z0-9_-]+)"
-                                    ]
-                                    for p in patterns:
-                                        match = re.search(p, url)
-                                        if match:
-                                            file_id = match.group(1)
-                                            break
-
-                                    if file_id:
-                                        # ✅ Use raw download URL (always image/jpeg)
-                                        direct_url = f"https://drive.usercontent.google.com/download?id={file_id}&export=view"
-                                        try:
-                                            resp = requests.get(direct_url, timeout=10)
-                                            if resp.status_code == 200 and resp.headers.get("Content-Type", "").startswith("image"):
-                                                img = Image.open(BytesIO(resp.content))
-                                                cols[i % 4].image(
-                                                    img,
-                                                    caption=os.path.basename(url),
-                                                    use_container_width=True
-                                                )
-                                            else:
-                                                cols[i % 4].markdown(
-                                                    f"⚠️ <span style='color:red;'>Not an image or access blocked:</span> {direct_url}",
-                                                    unsafe_allow_html=True
-                                                )
-                                        except Exception as e:
-                                            cols[i % 4].markdown(
-                                                f"❌ <span style='color:red;'>Failed to load image:</span> {e}",
-                                                unsafe_allow_html=True
-                                            )
-                                    else:
-                                        cols[i % 4].markdown(
-                                            f"⚠️ No file ID found in URL: {url}",
-                                            unsafe_allow_html=True
-                                        )
-                                else:
-                                    cols[i % 4].markdown(
-                                        f"⚠️ Invalid or missing image: {url}",
-                                        unsafe_allow_html=True
-                                    )
-
-
-                        # --- Village Summary ---
-                        st.markdown("#### 📊 Village Summary")
-                        colv1, colv2, colv3 = st.columns(3)
-                        avg_quality_v = df_v["crop_quality"].mean()
-                        area_pct_v = (df_v["area_actual_cultivated"].sum() / df_v["plot_area"].sum() * 100) if df_v["plot_area"].sum() > 0 else 0
-
-                        with colv1:
-                            fig_vq = px.pie(
-                                names=["Quality", "Remaining"],
-                                values=[avg_quality_v * 20, 100 - avg_quality_v * 20],
-                                title="Avg Quality (%)",
-                                color_discrete_sequence=["lightgray", "green"]
-                            )
-                            st.plotly_chart(
-                                fig_vq,
-                                config={"displayModeBar": False, "responsive": True},
-                                use_container_width=True,
-                                key=f"fig_vq_{block}_{v}"
-                            )
-
-                        with colv2:
-                            fig_va = px.pie(
-                                names=["Cultivated", "Uncultivated"],
-                                values=[area_pct_v, 100 - area_pct_v],
-                                title="Avg Area Cultivated (%)",
-                                color_discrete_sequence=["lightgray", "blue"]
-                            )
-                            st.plotly_chart(
-                                fig_va,
-                                config={"displayModeBar": False, "responsive": True},
-                                use_container_width=True,
-                                key=f"fig_va_{block}_{v}"
-                            )
-
-                        with colv3:
-                            fig_vi = px.pie(
-                                names=["Inspected", "Pending"],
-                                values=[1, 0],
-                                title="Inspection Status",
-                                color_discrete_sequence=["lightgray", "red"]
-                            )
-                            st.plotly_chart(
-                                fig_vi,
-                                config={"displayModeBar": False, "responsive": True},
-                                use_container_width=True,
-                                key=f"fig_vi_{block}_{v}"
-                            )
-
-                        # --- Data Table + Download ---
-                        st.markdown("#### 📋 Submission Data")
-                        show_cols = [
-                            "village", "block", "crop_quality", "area_actual_cultivated",
-                            "plot_area", "area_%", "photo_selfie_name", "photo_field_name",
-                            "photo_selfie_url", "photo_field_url"
-                        ]
-                        show_cols = [c for c in show_cols if c in df_v.columns]
-                        st.dataframe(df_v[show_cols], use_container_width=True)
-
-                        out_village = BytesIO()
-                        with pd.ExcelWriter(out_village, engine="openpyxl") as w:
-                            df_v.to_excel(w, index=False, sheet_name=f"{v}")
-                        st.download_button(
-                            f"📥 Download {v} Data",
-                            out_village.getvalue(),
-                            f"{block}_{v}_photos.xlsx",
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        )
-
-                    # --- Block Summary Table + Download ---
-                    st.markdown("### 📋 Block Submission Summary")
-                    st.dataframe(df_block[show_cols], use_container_width=True)
-
-                    out_block = BytesIO()
-                    with pd.ExcelWriter(out_block, engine="openpyxl") as w:
-                        df_block.to_excel(w, index=False, sheet_name=f"{block}")
-                    st.download_button(
-                        f"📥 Download {block} Block Data",
-                        out_block.getvalue(),
-                        f"{block}_block_photo_data.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ----------------------------
 # TAB 2 — Progress Monitoring (Placeholder)
 # ----------------------------
 with tab2:
     st.info("Progress Monitoring enhancements will use these renamed fields and baseline for comparison.")
+
+
+
+
+# ------------------- END -------------------
