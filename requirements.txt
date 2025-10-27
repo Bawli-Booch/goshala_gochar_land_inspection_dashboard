@@ -1,0 +1,24 @@
+# Core web framework
+streamlit>=1.39.0
+
+# Data handling
+pandas>=2.2.2
+numpy>=1.26.4
+openpyxl>=3.1.2
+
+# Plotting and visualization
+plotly>=5.24.0
+folium>=0.17.0
+streamlit-folium>=0.21.0
+
+# Image handling and HTTP requests
+requests>=2.32.3
+Pillow>=10.4.0
+
+# Google Sheets and Drive integration
+gspread>=6.1.2
+google-auth>=2.35.0
+google-api-python-client>=2.149.0
+
+# Misc utilities
+protobuf>=5.27.2
