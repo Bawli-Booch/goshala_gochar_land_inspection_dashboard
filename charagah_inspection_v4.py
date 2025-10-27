@@ -27,6 +27,65 @@ import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 
+
+# --- Hide all Streamlit UI and Cloud branding ---
+hide_streamlit_branding = """
+    <style>
+    /* Hide Streamlit main header and footer */
+    #MainMenu {visibility: hidden !important;}
+    header {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+
+    /* Hide possible Streamlit Cloud floating buttons */
+    [data-testid="stStatusWidget"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecorationContainer"] {display: none !important;}
+    .stAppDeployButton {display: none !important;}
+    button[data-testid="manage-app-button"] {display: none !important;}
+    div[class*="_link_"] {display: none !important;}
+    div[title="Manage app"] {display: none !important;}
+    div[data-testid="stActionButton"] {display: none !important;}
+    
+    /* 👇 Key trick: globally hide any Streamlit Cloud bottom-right floating button */
+    [class*="st-emotion-cache"] button[title*="Manage"], 
+    [class*="st-emotion-cache"] button[title*="View"],
+    [class*="st-emotion-cache"] a[href*="streamlit.app"],
+    [class*="st-emotion-cache"] svg[xmlns*="http"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Hide Streamlit Cloud overlay container completely */
+    div[style*="position: fixed"][style*="right: 0px"][style*="bottom: 0px"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    </style>
+
+    <script>
+    // In case Streamlit Cloud injects after render — try removing again
+    const hideCloudButton = () => {
+        const elems = document.querySelectorAll('button[title*="Manage"], button[title*="View"], a[href*="streamlit.app"], div[class*="_link_"]');
+        elems.forEach(el => el.style.display = "none");
+    };
+    setInterval(hideCloudButton, 1500);
+    </script>
+"""
+st.markdown(hide_streamlit_branding, unsafe_allow_html=True)
+
+#remove top padding
+st.set_page_config(layout="wide")
+st.markdown("""
+    <style>
+        div.block-container { padding-top: 0rem !important; }
+        section[data-testid="stTabs"] { margin-top: 0px !important; }
+    </style>
+""", unsafe_allow_html=True)
+
 # ----------------------------
 # CONFIG
 # ----------------------------
@@ -404,21 +463,53 @@ with tab1:
                     color="Status",
                     color_discrete_map={"Completed": "green", "Pending": "red"},
                 )
-                st.plotly_chart(fig_pie, use_container_width=True, key="Overall Inspection Completion %")
+                fig_pie.update_layout(
+                    autosize=True,
+                    margin=dict(l=20, r=20, t=40, b=20)
+                )
+
+                # ✅ Updated Streamlit Plotly call
+                st.plotly_chart(
+                    fig_pie,
+                    config={"displayModeBar": False, "responsive": True},
+                    use_container_width=True,
+                )
 
 
             st.markdown("---")
             # --- Bar Chart (block-wise progress) ---
             fig_bar = px.bar(
-                merged.melt(id_vars="block", value_vars=["required", "submitted", "remaining"],
-                            var_name="Status", value_name="Count"),
-                x="block", y="Count", color="Status",
-                color_discrete_map={"required": "blue", "submitted": "green", "remaining": "red"},
-                barmode="group", text="Count",
+                merged.melt(
+                    id_vars="block",
+                    value_vars=["required", "submitted", "remaining"],
+                    var_name="Status",
+                    value_name="Count"
+                ),
+                x="block",
+                y="Count",
+                color="Status",
+                color_discrete_map={
+                    "required": "blue",
+                    "submitted": "green",
+                    "remaining": "red"
+                },
+                barmode="group",
+                text="Count",
                 title="Block-wise Required vs Submitted vs Remaining"
             )
-            fig_bar.update_traces(texttemplate="%{text}", textposition="outside")
-            st.plotly_chart(fig_bar, use_container_width=True, key="Block-wise Required vs Submitted vs Remaining")
+
+            fig_bar.update_traces(
+                texttemplate="%{text}",
+                textposition="outside"
+            )
+
+            # ✅ Modern Streamlit Plotly call
+            st.plotly_chart(
+                fig_bar,
+                config={"displayModeBar": False, "responsive": True},
+                use_container_width=True,
+                key="block_required_vs_submitted"
+            )
 
             # --- Add total row ---
             total_row = pd.DataFrame([{
@@ -563,7 +654,14 @@ with tab1:
                 title="Total Area Cultivated (%)",
                 color_discrete_sequence=["green", "lightgray"]
             )
-            st.plotly_chart(fig1, use_container_width=True, key="Total Area Cultivated (%)")
+
+            # ✅ Modern, warning-free Streamlit call
+            st.plotly_chart(
+                fig1,
+                config={"displayModeBar": False, "responsive": True},
+                use_container_width=True,
+                key="total_area_cultivated_pie"
+            )
 
         with col2:
             fig2 = px.pie(
@@ -572,7 +670,13 @@ with tab1:
                 title="Average Quality (%)",
                 color_discrete_sequence=["#00CC96", "#E3755A"]
             )
-            st.plotly_chart(fig2, use_container_width=True, key="Average Quality (%)")
+
+            st.plotly_chart(
+                fig2,
+                config={"displayModeBar": False, "responsive": True},
+                use_container_width=True,
+                key="average_quality_pie"
+            )
 
         with col3:
             fig3 = px.pie(
@@ -581,7 +685,13 @@ with tab1:
                 title="Total Production Expected (%)",
                 color_discrete_sequence=["lightgray", "#FA0B9A"]
             )
-            st.plotly_chart(fig3, use_container_width=True, key="Total Production Expected (%)")
+
+            st.plotly_chart(
+                fig3,
+                config={"displayModeBar": False, "responsive": True},
+                use_container_width=True,
+                key="total_production_expected_pie"
+            )
 
         with col4:
             # Reuse total inspection data from overview
@@ -601,7 +711,13 @@ with tab1:
                     color="Status",
                     color_discrete_map={"Inspected": "green", "Pending": "red"}
                 )
-                st.plotly_chart(fig4, use_container_width=True, key="Inspection Completion (%")
+
+                st.plotly_chart(
+                    fig4,
+                    config={"displayModeBar": False, "responsive": True},
+                    use_container_width=True,
+                    key="inspection_completion_pie"
+                )
 
         st.markdown("---")
 
@@ -611,14 +727,22 @@ with tab1:
         st.markdown("## 🌱 % of Total Area Cultivated (Block-wise)")
 
         fig_cult = px.bar(
-            block_agg, x="block", y="cultivated_%",
-            color="cultivated_%", 
-            
+            block_agg,
+            x="block",
+            y="cultivated_%",
+            color="cultivated_%",
             color_continuous_scale=["#2fd973", "#66c2a4", "#238b45", "#09682f"],
-            title="% of Total Area Cultivated per Block", text="cultivated_%"
+            title="% of Total Area Cultivated per Block",
+            text="cultivated_%"
         )
         fig_cult.update_traces(texttemplate="%{text}%", textposition="outside")
-        st.plotly_chart(fig_cult, use_container_width=True, key=" percentage of Total Area Cultivated per Block")
+
+        st.plotly_chart(
+            fig_cult,
+            config={"displayModeBar": False, "responsive": True},
+            use_container_width=True,
+            key="total_area_cultivated_bar"
+        )
 
         st.dataframe(block_agg[["block", "total_plot_area", "total_cultivated", "cultivated_%"]].sort_values(by="cultivated_%", ascending=False))
 
@@ -634,13 +758,22 @@ with tab1:
         st.markdown("## 🌾 Quality of Cultivated Area (Block-wise)")
 
         fig_qual = px.bar(
-            block_agg, x="block", y="quality_%",
-            color="quality_%", 
+            block_agg,
+            x="block",
+            y="quality_%",
+            color="quality_%",
             color_continuous_scale=["#5DD6F5", "#1ee7f9", "#466ff7", "#0639F0"],
-            title="Average Crop Quality per Block", text="quality_%"
+            title="Average Crop Quality per Block",
+            text="quality_%"
         )
         fig_qual.update_traces(texttemplate="%{text}%", textposition="outside")
-        st.plotly_chart(fig_qual, use_container_width=True, key="Average Crop Quality per Block")
+
+        st.plotly_chart(
+            fig_qual,
+            config={"displayModeBar": False, "responsive": True},
+            use_container_width=True,
+            key="average_crop_quality_bar"
+        )
 
         st.dataframe(block_agg[["block", "avg_quality", "quality_%"]].sort_values(by="quality_%", ascending=False))
 
@@ -655,12 +788,22 @@ with tab1:
         st.markdown("## 🧮 Total Production Expected (Block-wise)")
 
         fig_prod = px.bar(
-            block_agg, x="block", y="production_%",
-            color="production_%", color_continuous_scale="Oranges",
-            title="Expected Production (Cultivation × Quality)", text="production_%"
+            block_agg,
+            x="block",
+            y="production_%",
+            color="production_%",
+            color_continuous_scale="Oranges",
+            title="Expected Production (Cultivation × Quality)",
+            text="production_%"
         )
         fig_prod.update_traces(texttemplate="%{text}%", textposition="outside")
-        st.plotly_chart(fig_prod, use_container_width=True, key="Expected Production (Cultivation × Quality)")
+
+        st.plotly_chart(
+            fig_prod,
+            config={"displayModeBar": False, "responsive": True},
+            use_container_width=True,
+            key="expected_production_bar"
+        )
 
         st.dataframe(block_agg[["block", "production_%"]].sort_values(by="production_%", ascending=False))
 
@@ -888,16 +1031,31 @@ with tab1:
                             title="Average Quality (%)",
                             color_discrete_sequence=["lightgray", "green"]
                         )
-                        st.plotly_chart(fig_q, use_container_width=True, key=f"avg_quality_{block}")
+
+                        st.plotly_chart(
+                            fig_q,
+                            config={"displayModeBar": False, "responsive": True},
+                            use_container_width=True,
+                            key=f"avg_quality_{block}"
+                        )
+
                     with c2:
                         cultivated_pct = (total_cult / total_area * 100) if total_area > 0 else 0
+
                         fig_a = px.pie(
                             names=["Cultivated", "Uncultivated"],
                             values=[cultivated_pct, 100 - cultivated_pct],
                             title="Total Area Cultivated (%)",
                             color_discrete_sequence=["lightgray", "blue"]
                         )
-                        st.plotly_chart(fig_a, use_container_width=True, key=f"area_cult_{block}")
+
+                        st.plotly_chart(
+                            fig_a,
+                            config={"displayModeBar": False, "responsive": True},
+                            use_container_width=True,
+                            key=f"area_cult_{block}"
+                        )
+
                     with c3:
                         fig_i = px.pie(
                             names=["Inspected", "Pending"],
@@ -905,7 +1063,13 @@ with tab1:
                             title="Inspections Completed",
                             color_discrete_sequence=["lightgray", "red"]
                         )
-                        st.plotly_chart(fig_i, use_container_width=True, key=f"inspect_done_{block}")
+
+                        st.plotly_chart(
+                            fig_i,
+                            config={"displayModeBar": False, "responsive": True},
+                            use_container_width=True,
+                            key=f"inspect_done_{block}"
+                        )
 
                     st.markdown("---")
 
@@ -927,9 +1091,16 @@ with tab1:
                         if len(photo_urls) == 0:
                             st.warning("⚠️ No matching Drive photos found for this village.")
                         else:
+
+                            #display image iteration loop
+
+                            import requests
+                            from io import BytesIO
+                            from PIL import Image
+
                             for i, url in enumerate(photo_urls):
                                 if isinstance(url, str) and url.startswith("http"):
-                                    # --- Extract the file ID from any Google Drive link format ---
+                                    # --- Extract file ID from any Google Drive link format ---
                                     file_id = None
                                     patterns = [
                                         r"id=([a-zA-Z0-9_-]+)",
@@ -944,28 +1115,35 @@ with tab1:
                                             break
 
                                     if file_id:
-                                        # ✅ Use raw Googleusercontent link (always works inline)
+                                        # ✅ Use raw download URL (always image/jpeg)
                                         direct_url = f"https://drive.usercontent.google.com/download?id={file_id}&export=view"
-
-                                        image_html = f"""
-                                            <div style='text-align:center; margin:8px;'>
-                                                <img src="{direct_url}" 
-                                                    style="width:100%; border-radius:12px; box-shadow:0 0 5px rgba(0,0,0,0.2);" 
-                                                    alt="Photo" />
-                                                <p style='font-size:12px; color:#444; margin-top:4px;'>
-                                                    {os.path.basename(url)}
-                                                </p>
-                                            </div>
-                                        """
-                                        cols[i % 4].markdown(image_html, unsafe_allow_html=True)
+                                        try:
+                                            resp = requests.get(direct_url, timeout=10)
+                                            if resp.status_code == 200 and resp.headers.get("Content-Type", "").startswith("image"):
+                                                img = Image.open(BytesIO(resp.content))
+                                                cols[i % 4].image(
+                                                    img,
+                                                    caption=os.path.basename(url),
+                                                    use_container_width=True
+                                                )
+                                            else:
+                                                cols[i % 4].markdown(
+                                                    f"⚠️ <span style='color:red;'>Not an image or access blocked:</span> {direct_url}",
+                                                    unsafe_allow_html=True
+                                                )
+                                        except Exception as e:
+                                            cols[i % 4].markdown(
+                                                f"❌ <span style='color:red;'>Failed to load image:</span> {e}",
+                                                unsafe_allow_html=True
+                                            )
                                     else:
                                         cols[i % 4].markdown(
-                                            f"⚠️ <span style='color:red;'>No file ID found:</span> {url}",
+                                            f"⚠️ No file ID found in URL: {url}",
                                             unsafe_allow_html=True
                                         )
                                 else:
                                     cols[i % 4].markdown(
-                                        f"⚠️ <span style='color:red;'>Invalid or missing image:</span> {url}",
+                                        f"⚠️ Invalid or missing image: {url}",
                                         unsafe_allow_html=True
                                     )
 
@@ -983,7 +1161,13 @@ with tab1:
                                 title="Avg Quality (%)",
                                 color_discrete_sequence=["lightgray", "green"]
                             )
-                            st.plotly_chart(fig_vq, use_container_width=True, key=f"fig_vq_{block}_{v}")
+                            st.plotly_chart(
+                                fig_vq,
+                                config={"displayModeBar": False, "responsive": True},
+                                use_container_width=True,
+                                key=f"fig_vq_{block}_{v}"
+                            )
+
                         with colv2:
                             fig_va = px.pie(
                                 names=["Cultivated", "Uncultivated"],
@@ -991,7 +1175,13 @@ with tab1:
                                 title="Avg Area Cultivated (%)",
                                 color_discrete_sequence=["lightgray", "blue"]
                             )
-                            st.plotly_chart(fig_va, use_container_width=True, key=f"fig_va_{block}_{v}")
+                            st.plotly_chart(
+                                fig_va,
+                                config={"displayModeBar": False, "responsive": True},
+                                use_container_width=True,
+                                key=f"fig_va_{block}_{v}"
+                            )
+
                         with colv3:
                             fig_vi = px.pie(
                                 names=["Inspected", "Pending"],
@@ -999,7 +1189,12 @@ with tab1:
                                 title="Inspection Status",
                                 color_discrete_sequence=["lightgray", "red"]
                             )
-                            st.plotly_chart(fig_vi, use_container_width=True, key=f"fig_vi_{block}_{v}")
+                            st.plotly_chart(
+                                fig_vi,
+                                config={"displayModeBar": False, "responsive": True},
+                                use_container_width=True,
+                                key=f"fig_vi_{block}_{v}"
+                            )
 
                         # --- Data Table + Download ---
                         st.markdown("#### 📋 Submission Data")
