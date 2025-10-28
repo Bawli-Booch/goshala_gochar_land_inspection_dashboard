@@ -1,4 +1,4 @@
-# charagah_inspection_v6.py
+# charagah_inspection_v7.py
 """
 🐄 Goshala Inspection Dashboard — Final Integrated Version
 Features:
@@ -78,7 +78,7 @@ hide_streamlit_branding = """
 st.markdown(hide_streamlit_branding, unsafe_allow_html=True)
 
 #remove top padding
-st.set_page_config(page_title="गोशाला चरागाह निरीक्षण Dashboard V6 - ui", layout="wide")
+st.set_page_config(page_title="गोशाला चरागाह निरीक्षण Dashboard V7 - final", layout="wide")
 st.markdown("""
     <style>
         div.block-container { padding-top: 0rem !important; }
@@ -434,14 +434,16 @@ def remove_duplicates(df_raw):
     #df_raw = df_raw.drop(columns=["created_date"], errors="ignore")
 
     # Summary info
-    st.info(f"✅ Cleaned data: {len(df_raw)} unique (latest) submissions per village per day.")
+    #st.info(f"✅ Cleaned data: {len(df_raw)} unique (latest) submissions per village per day.")
 
     return df_raw
 # ----------------------------
 # LOAD GOOGLE SHEET + RENAME
 # ----------------------------
-#st.set_page_config(page_title="गोशाला चरागाह निरीक्षण Dashboard", layout="wide")
+#st.set_page_config(page_title="Goshala Dashboard", layout="wide")
 st.title("🐄 गोशाला चरागाह निरीक्षण Dashboard")
+st.markdown("---")
+
 
 with st.spinner("Loading Google Sheet..."):
     df_raw = load_google_sheet(GOOGLE_SHEET_URL, gcp_creds)
@@ -1402,6 +1404,261 @@ with tab1:
             st.warning("⚠️ No GPS columns ('latitude', 'longitude') found in dataset.")
 
         st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+    # --- PHOTO SUBTAB ---
+    # --- PHOTO SUBTAB ---
+    # --- PHOTO SUBTAB ---
+    # --- PHOTO SUBTAB ---
+    with sub_photo:
+        import re, json, requests, html
+        from io import BytesIO
+        from PIL import Image
+        from streamlit.components.v1 import html as st_html
+
+        #st.markdown("<h3 style='text-align:center; color:#2E7D32;'>📸 Photo Analytics — From Submission Data</h3>", unsafe_allow_html=True)
+        #st.markdown("---")
+
+        # ================================================================
+        # 1️⃣ Extract filenames from URLs
+        # ================================================================
+        def extract_filename_from_url(url):
+            if not isinstance(url, str) or not url:
+                return None
+            m = re.search(r"(IMG-[\d_]+[a-zA-Z0-9]+\.jpe?g)", url)
+            return m.group(1) if m else None
+
+        df_last["photo_selfie_name"] = df_last["photo_selfie"].apply(extract_filename_from_url)
+        df_last["photo_field_name"] = df_last["photo_field"].apply(extract_filename_from_url)
+
+        # ================================================================
+        # 2️⃣ Load Google Drive photos and normalize URLs
+        # ================================================================
+        drive_folder_id = "1SO-p_yU7ARjEsMIcEqu7m2T8Dh2Bt4BJ"
+        try:
+            df_drive = fetch_drive_photos(folder_id=drive_folder_id, _creds_json=st.secrets["gcp_service_account"])
+            #st.success(f"✅ Loaded {len(df_drive)} photos from Google Drive.")
+        except Exception as e:
+            st.error(f"❌ Failed to load Drive photos: {e}")
+            df_drive = pd.DataFrame(columns=["file_name", "public_url"])
+
+        drive_map = dict(zip(df_drive["file_name"], df_drive["public_url"]))
+        df_last["photo_selfie_url"] = df_last["photo_selfie_name"].map(drive_map)
+        df_last["photo_field_url"] = df_last["photo_field_name"].map(drive_map)
+
+        def normalize_drive_url(url):
+            if not isinstance(url, str) or not url:
+                return None
+            m = re.search(r"(?:id=|/d/|uc\\?id=|download\\?id=)([a-zA-Z0-9_-]{15,})", url)
+            if not m:
+                return url
+            file_id = m.group(1)
+            return f"https://drive.usercontent.google.com/download?id={file_id}"
+
+        for col in ["photo_selfie_url", "photo_field_url"]:
+            df_last[col] = df_last[col].apply(normalize_drive_url)
+
+        # ================================================================
+        # 3️⃣ Debug Table
+        # ================================================================
+        #st.markdown("### 🧩 Debug: Sample Mapped URLs")
+        #st.dataframe(df_last[["village", "block", "photo_selfie_url", "photo_field_url"]].head(10))
+
+        # ================================================================
+        # 4️⃣ Function to render gallery (iframe-safe)
+        # ================================================================
+        import base64
+
+        def render_gallery(photo_urls, captions, gallery_id="gallery1"):
+            """Renders image gallery with base64 inline encoding (Streamlit-safe)."""
+            if not photo_urls:
+                st.warning("⚠️ No photos to display.")
+                return
+
+            # Fetch and encode images as base64
+            encoded_photos = []
+            for i, url in enumerate(photo_urls):
+                try:
+                    resp = requests.get(url, timeout=10)
+                    if resp.status_code == 200 and "image" in resp.headers.get("Content-Type", ""):
+                        img_b64 = base64.b64encode(resp.content).decode("utf-8")
+                        mime = resp.headers.get("Content-Type", "image/jpeg")
+                        encoded_photos.append(f"data:{mime};base64,{img_b64}")
+                    else:
+                        st.write(f"⚠️ Skipped non-image or failed URL: {url}")
+                except Exception as e:
+                    st.write(f"❌ Error fetching {url}: {e}")
+
+            if not encoded_photos:
+                st.warning("⚠️ No valid image data after download.")
+                return
+
+            photo_json = json.dumps(encoded_photos)
+            caption_json = json.dumps(captions)
+
+            gallery_html = f"""
+            <html>
+            <head>
+            <meta charset="utf-8">
+            <style>
+            body {{
+                font-family: Arial;
+                background-color: #f9f9f9;
+                margin: 0;
+                padding: 10px;
+            }}
+            .gallery {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 10px;
+            }}
+            .gallery img {{
+                width: 100%;
+                border-radius: 10px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                transition: transform 0.2s ease;
+            }}
+            .gallery img:hover {{ transform: scale(1.05); }}
+            .modal {{
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                left: 0; top: 0;
+                width: 100%; height: 100%;
+                background-color: rgba(0,0,0,0.95);
+                text-align: center;
+            }}
+            .modal img {{
+                max-width: 95%;
+                max-height: 80vh;
+                border-radius: 10px;
+                margin-top: 50px;
+            }}
+            .caption {{
+                color: white;
+                font-size: 18px;
+                margin-top: 10px;
+            }}
+            .close, .prev, .next {{
+                position: absolute;
+                color: white;
+                font-size: 36px;
+                font-weight: bold;
+                cursor: pointer;
+            }}
+            .close {{ top: 20px; right: 40px; }}
+            .prev {{ top: 50%; left: 40px; transform: translateY(-50%); }}
+            .next {{ top: 50%; right: 40px; transform: translateY(-50%); }}
+            </style>
+            </head>
+            <body>
+
+            <div class="gallery" style="margin-bottom:0; padding-bottom:0;">
+                {"".join([
+                    f"<img src='{html.escape(u)}' alt='{html.escape(c)}' onclick='openModal({i})' "
+                    f"style='display:block; margin:0; padding:0;'/>"
+                    for i,(u,c) in enumerate(zip(encoded_photos,captions))
+                ])}
+            </div>
+
+            <div id="modal" class="modal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <span class="prev" onclick="prevImage()">&#10094;</span>
+                <span class="next" onclick="nextImage()">&#10095;</span>
+                <img id="modal-img">
+                <div class="caption" id="modal-caption"></div>
+            </div>
+
+            <script>
+            const photos = {photo_json};
+            const captions = {caption_json};
+            let currentIndex = 0;
+
+            function openModal(i) {{
+                currentIndex = i;
+                document.getElementById("modal").style.display = "block";
+                document.getElementById("modal-img").src = photos[i];
+                document.getElementById("modal-caption").innerText = captions[i];
+            }}
+            function closeModal() {{
+                document.getElementById("modal").style.display = "none";
+            }}
+            function nextImage() {{
+                currentIndex = (currentIndex + 1) % photos.length;
+                openModal(currentIndex);
+            }}
+            function prevImage() {{
+                currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+                openModal(currentIndex);
+            }}
+            </script>
+            </body>
+            </html>
+            """
+
+            st_html(gallery_html, height=650, scrolling=True)
+
+        # ================================================================
+        # 5️⃣ Block Tabs + Village Galleries
+        # ================================================================
+        blocks = sorted(df_last["block"].dropna().unique())
+        if not blocks:
+            st.warning("⚠️ No block data available.")
+        else:
+            #st.markdown("### 🏢 Select Block to View Photos")
+            block_tabs = st.tabs(blocks)
+
+            for b_i, block in enumerate(blocks):
+                with block_tabs[b_i]:
+                    df_block = df_last[df_last["block"] == block].copy()
+
+                    # --- Block Gallery ---
+                    st.markdown(f"#### 🏞️ {block} — All Photos")
+
+                    # Melt to combine selfie + field photos while keeping village info
+                    df_block_long = (
+                        df_block.melt(
+                            id_vars=["village", "block", "date"],
+                            value_vars=["photo_selfie_url", "photo_field_url"],
+                            var_name="photo_type",
+                            value_name="url"
+                        )
+                        .dropna(subset=["url"])
+                        .reset_index(drop=True)
+                    )
+
+                    # Extract unique URLs and create matching captions (village - block - date)
+                    block_photos = df_block_long["url"].unique().tolist()
+                    block_captions = [
+                        f"{row['village']} - {row['block']} - {row['date'] if 'date' in row else ''}"
+                        for _, row in df_block_long.iterrows()
+                        if row["url"] in block_photos
+                    ]
+
+                    # Render gallery using base64-safe display
+                    render_gallery(block_photos, block_captions, gallery_id=f"block_{block}")
+
+                    st.markdown("---")
+
+                    # --- Village Galleries ---
+                    villages = sorted(df_block["village"].dropna().unique())
+                    for v in villages:
+                        st.markdown(f"#### 📍 Village: {v}")
+                        df_v = df_block[df_block["village"] == v].copy()
+
+                        photos, captions = [], []
+                        for c in ["photo_selfie_url", "photo_field_url"]:
+                            for u in df_v[c].dropna().unique():
+                                photos.append(u)
+                                captions.append(f"{v} - {block} - {df_v['date'].iloc[0] if 'date' in df_v else ''}")
+
+                        if photos:
+                            render_gallery(photos, captions, gallery_id=f"{v}_{block}")
+                        else:
+                            st.warning("⚠️ No photos found for this village.")
+
 
 # ----------------------------
 # TAB 2 — Progress Monitoring (Placeholder)
