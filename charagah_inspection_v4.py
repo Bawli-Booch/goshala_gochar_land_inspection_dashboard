@@ -1615,7 +1615,7 @@ with tab1:
                     df_block = df_last[df_last["block"] == block].copy()
 
                     # --- Block Gallery ---
-                    st.markdown(f"#### 🏞️ {block} — All Photos")
+                    st.markdown(f"#### 🏞️ {block} Block All Inspection Photos")
 
                     # Melt to combine selfie + field photos while keeping village info
                     df_block_long = (
