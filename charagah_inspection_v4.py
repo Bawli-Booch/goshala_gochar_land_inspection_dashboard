@@ -434,7 +434,7 @@ def remove_duplicates(df_raw):
     #df_raw = df_raw.drop(columns=["created_date"], errors="ignore")
 
     # Summary info
-    #st.info(f"✅ Cleaned data: {len(df_raw)} unique (latest) submissions per village per day.")
+    # st.info(f"✅ Cleaned data: {len(df_raw)} unique (latest) submissions per village per day.")
 
     return df_raw
 # ----------------------------
