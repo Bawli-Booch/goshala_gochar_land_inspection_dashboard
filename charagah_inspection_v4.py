@@ -1616,6 +1616,7 @@ with tab1:
 
                     # --- Block Gallery ---
                     st.markdown(f"#### 🏞️ {block} Block All Inspection Photos")
+                    st.markdown("---")
 
                     # Melt to combine selfie + field photos while keeping village info
                     df_block_long = (
@@ -1646,6 +1647,7 @@ with tab1:
                     villages = sorted(df_block["village"].dropna().unique())
                     for v in villages:
                         st.markdown(f"##### 📍  {v} Village all Inspections Photos")
+                        st.markdown("---")
                         df_v = df_block[df_block["village"] == v].copy()
 
                         photos, captions = [], []
