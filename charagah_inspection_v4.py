@@ -440,8 +440,8 @@ def remove_duplicates(df_raw):
 # ----------------------------
 # LOAD GOOGLE SHEET + RENAME
 # ----------------------------
-#st.set_page_config(page_title="Goshala Dashboard", layout="wide")
-st.title("🐄 Goshala Inspection Dashboard")
+#st.set_page_config(page_title="गोशाला चरागाह निरीक्षण Dashboard", layout="wide")
+st.title("🐄 गोशाला चरागाह निरीक्षण Dashboard")
 
 with st.spinner("Loading Google Sheet..."):
     df_raw = load_google_sheet(GOOGLE_SHEET_URL, gcp_creds)
