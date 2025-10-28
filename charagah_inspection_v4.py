@@ -1645,7 +1645,7 @@ with tab1:
                     # --- Village Galleries ---
                     villages = sorted(df_block["village"].dropna().unique())
                     for v in villages:
-                        st.markdown(f"#### 📍 Village: {v}")
+                        st.markdown(f"##### 📍  {v} Village all Inspections Photos")
                         df_v = df_block[df_block["village"] == v].copy()
 
                         photos, captions = [], []
