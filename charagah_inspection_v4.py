@@ -442,7 +442,7 @@ def remove_duplicates(df_raw):
 # ----------------------------
 #st.set_page_config(page_title="Goshala Dashboard", layout="wide")
 st.title("🐄 गोशाला चरागाह निरीक्षण Dashboard")
-st.markdown("---")
+#st.markdown("---")
 
 
 with st.spinner("Loading Google Sheet..."):
